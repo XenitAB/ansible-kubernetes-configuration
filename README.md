@@ -14,7 +14,7 @@ You will also need to update the Azure Service Connections in `.ci/templates/pip
 
 NOTE: Since we import secrets from KeyVault, it will fail when running manually without the correct variables avaiable.
 
-```
+```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -U pip
