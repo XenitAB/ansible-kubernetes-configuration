@@ -40,4 +40,4 @@ jobs:
           env:
             externalDns: $(external-dns)
             kubernetesBackup: $(kubernetes-backup)
-            datadogApiKey: $(datadog-api-key)
+            # datadogApiKey: $(datadog-api-key)

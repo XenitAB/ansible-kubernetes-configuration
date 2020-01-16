@@ -45,7 +45,7 @@ configuration:
     labels:
       istio-injection: disabled
   datadog:
-    enabled: true
+    enabled: false
     state: present
     namespace: datadog
     site: datadoghq.eu
