@@ -8,7 +8,7 @@ stages:
       deployment: Deploy_dev
       vmImage: $(vmImage)
       environment: dev
-      azureSubscription: 'azure-tflab-dev-owner'
+      azureSubscription: 'azureRm'
 
 - stage: Deploy_qa
   variables:
@@ -20,7 +20,7 @@ stages:
       deployment: Deploy_qa
       vmImage: $(vmImage)
       environment: qa
-      azureSubscription: 'azure-tflab-qa-owner'
+      azureSubscription: 'azureRm'
 
 - stage: Deploy_prod
   variables:
@@ -32,4 +32,4 @@ stages:
       deployment: Deploy_prod
       vmImage: $(vmImage)
       environment: prod
-      azureSubscription: 'azure-tflab-prod-owner'
+      azureSubscription: 'azureRm'
