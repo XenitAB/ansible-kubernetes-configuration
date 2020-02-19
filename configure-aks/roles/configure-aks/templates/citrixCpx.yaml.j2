@@ -469,6 +469,12 @@ spec:
       - name: cpx-configurations
         configMap:
           name: cpx-configurations
+      - name: cpx-ingress-secret
+        secret:
+          secretName: cpx-ingress
+          items:
+          - key: dhkey
+            path: dhkey
       containers:
         - name: cpx-ingress
           image: "{{ configuration.citrixCpx.cpxImage }}:{{ configuration.citrixCpx.cpxImageVersion }}"
@@ -506,6 +512,9 @@ spec:
           - name: cpx-configurations
             mountPath: /etc/cpx.conf
             subPath: cpx.conf
+          - name: cpx-ingress-secret
+            mountPath: "/cpxsecret"
+            readOnly: true
         - name: cic
           image: "{{ configuration.citrixCpx.cicImage }}:{{ configuration.citrixCpx.cicImageVersion }}"
           env:
