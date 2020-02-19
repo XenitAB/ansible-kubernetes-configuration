@@ -66,6 +66,12 @@
       tags:
         - certManager
 
+    - name: Include opaGatekeeper.yml
+      include_tasks: opaGatekeeper/opaGatekeeper.yml
+      when: configuration.opaGatekeeper.enabled
+      tags:
+        - opaGatekeeper
+
     - name: Include citrixCpx.yml
       include_tasks: citrixCpx.yml
       when: configuration.citrixCpx.enabled

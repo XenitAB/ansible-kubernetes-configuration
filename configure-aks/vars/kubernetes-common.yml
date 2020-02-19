@@ -23,6 +23,18 @@ configuration:
     crdChecksum: "sha512:30d4a3bf2f958e81aabe51f3616eb91212ac7b9f684ef1da41cff863247ab19132096ed099675ed31976ec3fff2197faa865d0b13f7dc5c1ad1c7579b42afef4"
     labels:
       istio-injection: disabled
+  opaGatekeeper:
+    enabled: true
+    state: present
+    namespace: gatekeeper-system
+    name: gatekeeper-operator
+    gitRepo: https://github.com/open-policy-agent/gatekeeper.git
+    gitReleaseTag: v3.1.0-beta.7
+    labels:
+      istio-injection: disabled
+      gatekeeper.sh/system: "yes"
+      admission.gatekeeper.sh/ignore: no-self-managing
+      control-plane: controller-manager
   citrixCpx:
     enabled: true
     state: present
