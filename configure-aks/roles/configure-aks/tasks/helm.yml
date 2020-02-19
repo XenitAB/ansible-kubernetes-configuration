@@ -1,8 +1,26 @@
-- name: Download helm archive
+- name: Check OS
+  shell: uname
+  register: unameResult
+  tags:
+  - helm
+
+- name: Download helm archive - Linux
   get_url:
-    url: "https://storage.googleapis.com/kubernetes-helm/helm-{{ helm.version }}-linux-amd64.tar.gz"
-    checksum: "{{ helm.checksum }}"
+    url: "https://storage.googleapis.com/kubernetes-helm/helm-{{ helm.version }}-{{ unameResult.stdout | lower }}-amd64.tar.gz"
+    checksum: "{{ helm.checksumLinux }}"
     dest: "{{ helm.tmpDir }}"
+  when:
+    - (unameResult.stdout | lower) == "linux"
+  tags:
+    - helm
+
+- name: Download helm archive - Mac
+  get_url:
+    url: "https://storage.googleapis.com/kubernetes-helm/helm-{{ helm.version }}-{{ unameResult.stdout | lower }}-amd64.tar.gz"
+    checksum: "{{ helm.checksumMac }}"
+    dest: "{{ helm.tmpDir }}"
+  when:
+    - (unameResult.stdout | lower) == "darwin"
   tags:
     - helm
 
@@ -16,14 +34,14 @@
 
 - name: Unarchive helm
   unarchive:
-    src: "{{ helm.tmpDir }}/helm-{{ helm.version }}-linux-amd64.tar.gz"
+    src: "{{ helm.tmpDir }}/helm-{{ helm.version }}-{{ unameResult.stdout | lower }}-amd64.tar.gz"
     dest: "{{ helm.tmpDir }}/helm-{{ helm.version }}"
   tags:
     - helm
 
 - name: Copy helm binary to destination directory
   copy:
-    src: "{{ helm.tmpDir }}/helm-{{ helm.version }}/linux-amd64/helm"
+    src: "{{ helm.tmpDir }}/helm-{{ helm.version }}/{{ unameResult.stdout | lower }}-amd64/helm"
     dest: "{{ helm.binDir }}/helm"
     mode: 0755
   tags:
