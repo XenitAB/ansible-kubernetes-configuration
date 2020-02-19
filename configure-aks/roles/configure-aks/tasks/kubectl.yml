@@ -1,14 +1,32 @@
-- name: Download kubernetes-client archive
+- name: Check OS
+  shell: uname
+  register: unameResult
+  tags:
+    - kubectl
+
+- name: Download kubernetes-client archive - Linux
   get_url:
-    url: "https://dl.k8s.io/v{{kubectl.version}}/kubernetes-client-{{kubectl.os}}-{{kubectl.arch}}.tar.gz"
-    checksum: "{{kubectl.checksum}}"
+    url: "https://dl.k8s.io/v{{kubectl.version}}/kubernetes-client-{{ unameResult.stdout | lower }}-{{kubectl.arch}}.tar.gz"
+    checksum: "{{kubectl.checksumLinux}}"
     dest: "{{kubectl.tmp_directory}}"
+  when:
+    - (unameResult.stdout | lower) == "linux"
+  tags:
+    - kubectl
+
+- name: Download kubernetes-client archive - Mac
+  get_url:
+    url: "https://dl.k8s.io/v{{kubectl.version}}/kubernetes-client-{{ unameResult.stdout | lower }}-{{kubectl.arch}}.tar.gz"
+    checksum: "{{kubectl.checksumMac}}"
+    dest: "{{kubectl.tmp_directory}}"
+  when:
+    - (unameResult.stdout | lower) == "darwin"
   tags:
     - kubectl
 
 - name: Unarchive kubernetes-client
   unarchive:
-    src: "{{kubectl.tmp_directory}}/kubernetes-client-{{kubectl.os}}-{{kubectl.arch}}.tar.gz"
+    src: "{{kubectl.tmp_directory}}/kubernetes-client-{{ unameResult.stdout | lower }}-{{kubectl.arch}}.tar.gz"
     dest: "{{kubectl.tmp_directory}}"
   tags:
     - kubectl

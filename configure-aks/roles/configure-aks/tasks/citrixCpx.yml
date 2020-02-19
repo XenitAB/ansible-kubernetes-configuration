@@ -51,8 +51,6 @@
               #NetScaler Commands
               set ssl param -defaultProfile ENABLED
 
-              create ssl dhParam dhkey -gen 2 2048
-
               add ssl cipher cpx-ciphers
               bind ssl cipher cpx-ciphers -cipherName TLS1.2-ECDHE-RSA-CHACHA20-POLY1305 -cipherPriority 1
               bind ssl cipher cpx-ciphers -cipherName TLS1.2-DHE-RSA-CHACHA20-POLY1305 -cipherPriority 2
@@ -61,7 +59,7 @@
               bind ssl cipher cpx-ciphers -cipherName TLS1.2-DHE-RSA-AES256-GCM-SHA384 -cipherPriority 5
               bind ssl cipher cpx-ciphers -cipherName TLS1.2-DHE-RSA-AES128-GCM-SHA256 -cipherPriority 6
 
-              set ssl profile ns_default_ssl_profile_frontend -dhCount 1000 -dh ENABLED -dhFile /nsconfig/ssl/dhkey -denySSLReneg NONSECURE -snienable ENABLED -HSTS ENABLED -maxage 157680000 -IncludeSubdomain no -tls1 DISABLED -tls11 DISABLED
+              set ssl profile ns_default_ssl_profile_frontend -dhCount 1000 -dh ENABLED -dhFile /cpxsecret/dhkey -denySSLReneg NONSECURE -snienable ENABLED -HSTS ENABLED -maxage 157680000 -IncludeSubdomain no -tls1 DISABLED -tls11 DISABLED
               unbind ssl profile ns_default_ssl_profile_frontend -cipherName FlushAllCiphers
               bind ssl profile ns_default_ssl_profile_frontend -cipherName cpx-ciphers -cipherPriority 1
 
@@ -86,6 +84,47 @@
               bind rewrite global rwp-add-xfp_https 14 NEXT -type REQ_DEFAULT
               bind rewrite global rwp-replace-xfp_https 15 NEXT -type REQ_DEFAULT
       register: cpxConfigResult
+      tags:
+        - citrixCpx
+
+    - name: Get CPX Secret
+      k8s_info:
+        kubeconfig: "{{ configuration.k8sconfiguration.dest }}"
+        api_version: v1
+        kind: Secret
+        namespace: "{{ configuration.citrixCpx.namespace }}"
+        label_selectors:
+          - app = cpx-ingress
+          - type = dhkey
+      register: cpxDhSecret
+      tags:
+        - citrixCpx
+
+    - name: Generate Citrix CPX DH Key
+      openssl_dhparam:
+        path: "{{ citrixCpxTempDir }}/dhparams.pem"
+        size: 2048
+      when: cpxDhSecret.resources == []
+      tags:
+        - citrixCpx
+
+    - name: Create k8s secret for cpx-ingress
+      k8s:
+        kubeconfig: "{{ configuration.k8sconfiguration.dest }}"
+        state: "{{ configuration.citrixCpx.state }}"
+        namespace: "{{ configuration.citrixCpx.namespace }}"
+        definition:
+          apiVersion: v1
+          kind: Secret
+          type: Opaque
+          metadata:
+            name: cpx-ingress
+            labels:
+              app: cpx-ingress
+              type: dhkey
+          data:
+            dhkey: "{{lookup('file', citrixCpxTempDir + '/dhparams.pem') | b64encode }}"
+      when: cpxDhSecret.resources == []
       tags:
         - citrixCpx
 
