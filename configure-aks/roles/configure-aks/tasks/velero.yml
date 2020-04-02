@@ -55,6 +55,16 @@
       tags:
         - velero
 
+    - name: Install velero CRDs
+      shell: '{{ kubectl.bin_directory }}/kubectl --kubeconfig="{{ configuration.k8sconfiguration.dest }}" apply -f "{{ veleroTempDir }}/velero/crds/"'
+      when: configuration.velero.state == "present"
+      register: veleroCrdResult
+      retries: 5
+      delay: 5
+      until: veleroCrdResult is succeeded
+      tags:
+        - velero
+
     - name: Install velero
       shell: '{{ kubectl.bin_directory }}/kubectl --kubeconfig="{{ configuration.k8sconfiguration.dest }}" --namespace={{ configuration.velero.namespace }} apply -f "{{ veleroTempDir }}/velero.yaml"'
       when: configuration.velero.state == "present"

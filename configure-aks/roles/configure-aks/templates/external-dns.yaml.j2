@@ -4,7 +4,7 @@ metadata:
   name: external-dns
   namespace: {{ configuration.externalDns.namespace }}
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: external-dns
@@ -25,7 +25,7 @@ rules:
   resources: ["gateways"]
   verbs: ["get","watch","list"]
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: external-dns-viewer
@@ -38,12 +38,15 @@ subjects:
   name: external-dns
   namespace: {{ configuration.externalDns.namespace }}
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: external-dns
   namespace: {{ configuration.externalDns.namespace }}
 spec:
+  selector:
+    matchLabels:
+      app: external-dns
   strategy:
     type: Recreate
   template:
@@ -57,9 +60,7 @@ spec:
         image: registry.opensource.zalan.do/teapot/external-dns:latest
         args:
         - --source=service
-{% if configuration.citrixCpx.enabled %}
         - --source=ingress
-{% endif %}
         - --provider=azure
         volumeMounts:
         - name: azure-config-file

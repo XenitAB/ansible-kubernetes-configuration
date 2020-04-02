@@ -102,6 +102,12 @@
       tags:
         - dnsTxtRecords
 
+    - name: Include nginxIngress.yml
+      include_tasks: nginxIngress.yml
+      when: configuration.nginxIngress.enabled
+      tags:
+        - nginxIngress
+
     - name: Remove k8s configuration
       file:
         state: absent
