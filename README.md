@@ -10,7 +10,24 @@ You need to update the variable group `tflab-keyvault-dev`, `tflab-keyvault-qa` 
 
 You will also need to update the Azure Service Connections in `.ci/templates/pipeline.yml` (`azureSubscription`) to use a service principal with owner or contributor on the subscription.
 
-### Manually
+### Manually use secrets
+
+Create /tmp/tmp-secrets.sh
+
+```bash
+#!/bin/bash
+
+export externalDns="<exported from Azure KeyVault>"
+export kubernetesBackup="<exported from Azure KeyVault>"
+export datadogApiKey="<exported from Azure KeyVault>"
+```
+
+```bash
+chmod +x /tmp/tmp-secrets.sh
+source /tmp/tmp-secrets.sh
+```
+
+### Manually run ansible
 
 NOTE: Since we import secrets from KeyVault, it will fail when running manually without the correct variables avaiable.
 
@@ -23,4 +40,10 @@ az login
 export environmentShort="dev"
 export pythonLocation="$(pwd)/.venv/bin/python"
 ansible-playbook -i configure-aks/hosts configure-aks/configure-aks.yml -e "environmentShort=${environmentShort}" -e "ansible_python_interpreter=${pythonLocation}" --flush-cache
+```
+
+To run only with specific tags:
+
+```bash
+ansible-playbook -i configure-aks/hosts configure-aks/configure-aks.yml -e "environmentShort=${environmentShort}" -e "ansible_python_interpreter=${pythonLocation}" --flush-cache --tags="common,velero"
 ```

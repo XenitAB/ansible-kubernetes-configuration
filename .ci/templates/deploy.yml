@@ -2,7 +2,6 @@ parameters:
   deployment: ""
   vmImage: ""
   environment: ""
-  azureSubscription: ""
 
 jobs:
 - deployment: ${{ parameters.deployment }}
@@ -29,7 +28,7 @@ jobs:
         - task: AzureCLI@1
           displayName: 'Run ansible playbook'
           inputs:
-            azureSubscription: '${{ parameters.azureSubscription }}'
+            azureSubscription: 'azure-${{ parameters.environment }}-owner'
             addSpnToEnvironment: true
             scriptLocation: inlineScript
             inlineScript: |
@@ -40,4 +39,4 @@ jobs:
           env:
             externalDns: $(external-dns)
             kubernetesBackup: $(kubernetes-backup)
-            # datadogApiKey: $(datadog-api-key)
+            datadogApiKey: $(datadog-api-key)

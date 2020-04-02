@@ -18,25 +18,25 @@ configuration:
     helmRepo: https://charts.jetstack.io
     helmRepoName: jetstack
     helmChartName: cert-manager
-    helmChartVersion: 0.11.0
-    crdUrl: https://raw.githubusercontent.com/jetstack/cert-manager/release-0.11/deploy/manifests/00-crds.yaml
-    crdChecksum: "sha512:30d4a3bf2f958e81aabe51f3616eb91212ac7b9f684ef1da41cff863247ab19132096ed099675ed31976ec3fff2197faa865d0b13f7dc5c1ad1c7579b42afef4"
+    helmChartVersion: 0.14.1
+    crdUrl: https://raw.githubusercontent.com/jetstack/cert-manager/release-0.14/deploy/manifests/00-crds.yaml
+    crdChecksum: "sha512:ab1addfaa419061b6aa78da4d7dda69bcd7ece09e3ce91474927388decedb5110ba7782786742dfdbc66ff261c3dc8896c09d7f76d0c14637d3fda2754d24a92"
     labels:
       istio-injection: disabled
   opaGatekeeper:
-    enabled: true
+    enabled: false
     state: present
     namespace: gatekeeper-system
     name: gatekeeper-operator
     gitRepo: https://github.com/open-policy-agent/gatekeeper.git
-    gitReleaseTag: v3.1.0-beta.7
+    gitReleaseTag: v3.1.0-beta.8
     labels:
       istio-injection: disabled
       gatekeeper.sh/system: "yes"
       admission.gatekeeper.sh/ignore: no-self-managing
       control-plane: controller-manager
   citrixCpx:
-    enabled: true
+    enabled: false
     state: present
     cpxImage: "quay.io/citrix/citrix-k8s-cpx-ingress"
     cpxImageVersion: "13.0-47.103"
@@ -53,7 +53,7 @@ configuration:
     state: present
     namespace: velero
     helmChartName: velero
-    helmChartVersion: 2.2.0
+    helmChartVersion: 2.7.4
     labels:
       istio-injection: disabled
   datadog:
@@ -68,21 +68,30 @@ configuration:
     state: present
     namespace: kube-system
     name: kube-state-metrics
-    version: v1.5.0
+    version: v1.9.5
+  nginxIngress:
+    enabled: true
+    state: present
+    namespace: nginx-ingress
+    name: nginx-ingress
+    helmChartName: nginx-ingress
+    helmChartVersion: "1.34.3"
+    labels:
+      istio-injection: disabled
 
 kubectl:
-  version: "1.16.2"
-  checksumLinux: "sha512:69bb92c9b16c0286d7401d87cc73b85c88d6f9a17d2cf1748060e44525194b5be860daf7554c4c6319a546c9ff10f2b4df42a27e32d8f95a4052993b17ef57c0"
-  checksumMac: "sha512:791d2a4f965130ea1d7033f807b29015520afa317f97643f27480a6530213fd3fa06817ba9ce04e81f843b8420f05baa25e597e5880f99cc2ffbfc8b8ebf18cf"
+  version: "1.18.0"
+  checksumLinux: "sha512:594ca3eadc7974ec4d9e4168453e36ca434812167ef8359086cd64d048df525b7bd46424e7cc9c41e65c72bda3117326ba1662d1c9d739567f10f5684fd85bee"
+  checksumMac: "sha512:803a0fed122ef6b85f7a120b5485723eaade765b7bc8306d0c0da03bd3df15d800699d15ea2270bb7797fa9ce6a81da90e730dc793ea4ed8c0149b63d26eca30"
   bin_directory: "{{lookup('env', 'TMPDIR') | default('/tmp', true)}}"
-  tmp_directory: "{{lookup('env', 'TMPDIR') | default('/tmp',true)}}"
+  tmp_directory: "{{lookup('env', 'TMPDIR') | default('/tmp', true)}}"
   owner: "root"
   group: "root"
   arch: "amd64"
 
 helm:
-  version: v2.16.0
-  checksumLinux: "sha512:c4fc75186e46bf3ce2e067f82140ae965a20504ad0df941742ecd64481ba4a1a02a9ebead9e837c642262ffd10d761d97a1a3b9d470868c7f09936c7bdff7924"
-  checksumMac: "sha512:3e555dfa29ec59646cc95f9b24fc9a696f0663f0aa66eccc32a0db1f5fac147d6f3cdd69cc836bbba359487cc47b72e401421cd1ac3e017cf3cf94f7220c7776"
+  version: "v2.16.5"
+  checksumLinux: "sha512:4d02010813eae0c0a2fb5d8a7bec0139600ac53bd0b6ef34ded44c29864cff25275c35beddcb6698ddf5af4837461ea670a25fe39da1b3df6f85f4d8005caf51"
+  checksumMac: "sha512:7d26d630f13b0ea88769fc1365a3af9c22bfff7d127193e5d4c339d323f19cb8b044ad33e3d020252dda07d872e3e8e595ddaa261a2747edb04c312c9c2ff9d6"
   tmpDir: "{{lookup('env', 'TMPDIR') | default('/tmp', true)}}"
   binDir: "{{lookup('env', 'TMPDIR') | default('/tmp', true)}}"

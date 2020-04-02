@@ -8,7 +8,6 @@ stages:
       deployment: Deploy_dev
       vmImage: $(vmImage)
       environment: dev
-      azureSubscription: 'azureRm'
 
 - stage: Deploy_qa
   variables:
@@ -20,7 +19,6 @@ stages:
       deployment: Deploy_qa
       vmImage: $(vmImage)
       environment: qa
-      azureSubscription: 'azureRm'
 
 - stage: Deploy_prod
   variables:
@@ -32,4 +30,3 @@ stages:
       deployment: Deploy_prod
       vmImage: $(vmImage)
       environment: prod
-      azureSubscription: 'azureRm'
