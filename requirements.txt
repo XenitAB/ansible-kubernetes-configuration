@@ -1,5 +1,0 @@
-packaging
-msrestazure
-ansible-lint
-openshift
-ansible[azure]
